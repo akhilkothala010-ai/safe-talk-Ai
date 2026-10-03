@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - SafeTalk AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { primary: '#6b46c1', accent: '#4299e1' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f4f7fe; }
+        .hero-bg {
+            background: linear-gradient(135deg, #f5f3ff 0%, #e0e7ff 100%);
+            border-bottom-left-radius: 50% 10%;
+            border-bottom-right-radius: 50% 10%;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+    
+        /* Dark Mode Overrides */
+        html.dark body {
+            background-color: #111827;
+            color: #f3f4f6;
+        }
+        html.dark .hero-bg {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        }
+        html.dark .glass-card {
+            background: rgba(31, 41, 55, 0.95);
+            border-color: #374151;
+        }
+        html.dark nav {
+            background-color: #1f2937 !important;
+            color: #f3f4f6;
+        }
+        html.dark h1, html.dark h2, html.dark h3, html.dark span.text-gray-900 {
+            color: #f9fafb !important;
+        }
+        html.dark p.text-gray-600, html.dark p.text-gray-500, html.dark div.text-gray-500 {
+            color: #d1d5db !important;
+        }
+        html.dark textarea {
+            background-color: #374151;
+            color: white;
+            border-color: #4b5563;
+        }
+        html.dark .bg-white {
+            background-color: #1f2937 !important;
+        }
+        html.dark .bg-indigo-50 {
+            background-color: rgba(107, 70, 193, 0.2) !important;
+        }
+        html.dark .bg-gray-200 { background-color: #374151 !important; border-color: #1f2937 !important; }
+        html.dark .text-gray-800 { color: #f3f4f6 !important; }
+        html.dark .text-gray-900 { color: #f9fafb !important; }
+        html.dark .border-gray-200, html.dark .border-gray-100 { border-color: #374151 !important; }
+</style>
+</head>
+<body class="text-gray-800 font-sans min-h-screen flex flex-col">
+    
+    <!-- Hero Section -->
+    <div class="hero-bg pb-16 pt-4 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        
+        <!-- Navbar -->
+        <nav class="max-w-7xl mx-auto flex justify-between items-center bg-white rounded-full px-6 py-3 shadow-sm mb-12">
+            <div class="flex items-center space-x-2">
+                <div class="bg-primary text-white p-2 rounded-lg">
+                    <i class="fas fa-comment-dots text-xl"></i>
+                </div>
+                <span class="font-extrabold text-2xl tracking-tight text-gray-900">SafeTalk <span class="text-primary">AI</span></span>
+            </div>
+            
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
+                <a href="/" class="hover:text-primary px-4 py-2">Home</a>
+                <a href="/#detect" class="hover:text-primary px-4 py-2">Detect</a>
+                <a href="/about" class="bg-indigo-50 text-primary px-4 py-2 rounded-full">About</a>
+                <a href="/team" class="hover:text-primary px-4 py-2">Team</a>
+            </div>
+            
+            <div class="flex space-x-4 text-gray-500">
+                <button id="theme-sun" class="hover:text-primary cursor-pointer transition-colors" title="Light Mode"><i class="fas fa-sun text-lg"></i></button>
+                <button id="theme-moon" class="hover:text-primary cursor-pointer transition-colors" title="Dark Mode"><i class="fas fa-moon text-lg"></i></button>
+            </div>
+        </nav>
+
+        <!-- Hero Content -->
+        <div class="max-w-7xl mx-auto text-center z-10 relative">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
+                About <span class="text-primary">SafeTalk AI</span>
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Understanding the mission, technology, and importance of AI in online moderation.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 flex-grow mb-20 w-full">
+        <div class="glass-card rounded-2xl p-8 sm:p-10 border border-gray-100">
+            
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-bullseye text-primary mr-3"></i> Our Mission
+            </h2>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                The internet is a vast space for collaboration and connection, but it can also be a breeding ground for harassment, cyberbullying, and toxic behavior. SafeTalk AI was built with a single mission: to promote safer, more inclusive online communication by automatically identifying harmful content using advanced Natural Language Processing (NLP).
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-microchip text-primary mr-3"></i> How It Works
+            </h2>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                SafeTalk AI utilizes state-of-the-art Transformer models (like BERT and DistilBERT), fine-tuned on extensive datasets such as the Jigsaw Toxic Comment dataset. Unlike simple keyword filters that can easily be bypassed or misunderstood, our AI understands the context, nuance, and intent behind sentences. It categorizes text into multiple dimensions of toxicity, including severe toxicity, obscenity, threats, insults, and identity-based hate.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i> AI Limitations & Bias
+            </h2>
+            <div class="bg-red-50 border border-red-100 rounded-xl p-6 text-gray-700 space-y-4">
+                <p>While AI is powerful, it is not perfect. We believe in transparency regarding the limitations of automated moderation:</p>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>False Positives:</strong> The AI might incorrectly flag benign slang or playful banter between friends as toxic.</li>
+                    <li><strong>False Negatives:</strong> Highly obfuscated insults or deep sarcasm might evade detection.</li>
+                    <li><strong>Algorithmic Bias:</strong> If not carefully monitored, AI models can disproportionately flag dialects or terminology used by marginalized communities (such as AAVE or LGBTQ+ terms).</li>
+                </ul>
+                <p class="font-medium mt-4">We advocate for a "Human-in-the-Loop" approach, where AI acts as a shield and assistant, rather than a final judge.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Dark Mode Logic
+        const htmlDoc = document.documentElement;
+        const sunBtn = document.getElementById('theme-sun');
+        const moonBtn = document.getElementById('theme-moon');
+
+        // Check preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlDoc.classList.add('dark');
+        } else {
+            htmlDoc.classList.remove('dark');
+        }
+
+        if (sunBtn && moonBtn) {
+            sunBtn.addEventListener('click', () => { 
+                htmlDoc.classList.remove('dark'); 
+                localStorage.theme = 'light'; 
+            });
+            moonBtn.addEventListener('click', () => { 
+                htmlDoc.classList.add('dark'); 
+                localStorage.theme = 'dark'; 
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeTalk AI - Toxic Comment Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#6b46c1', /* Purple-ish */
+                        primaryLight: '#9f7aea',
+                        accent: '#4299e1', /* Blue-ish */
+                        bgLight: '#f7fafc',
+                        cardBg: '#ffffff',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f4f7fe;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, #f5f3ff 0%, #e0e7ff 100%);
+            border-bottom-left-radius: 50% 10%;
+            border-bottom-right-radius: 50% 10%;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+    
+        /* Dark Mode Overrides */
+        html.dark body {
+            background-color: #111827;
+            color: #f3f4f6;
+        }
+        html.dark .hero-bg {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        }
+        html.dark .glass-card {
+            background: rgba(31, 41, 55, 0.95);
+            border-color: #374151;
+        }
+        html.dark nav {
+            background-color: #1f2937 !important;
+            color: #f3f4f6;
+        }
+        html.dark h1, html.dark h2, html.dark h3, html.dark span.text-gray-900 {
+            color: #f9fafb !important;
+        }
+        html.dark p.text-gray-600, html.dark p.text-gray-500, html.dark div.text-gray-500 {
+            color: #d1d5db !important;
+        }
+        html.dark textarea {
+            background-color: #374151;
+            color: white;
+            border-color: #4b5563;
+        }
+        html.dark .bg-white {
+            background-color: #1f2937 !important;
+        }
+        html.dark .bg-indigo-50 {
+            background-color: rgba(107, 70, 193, 0.2) !important;
+        }
+        html.dark .bg-gray-200 { background-color: #374151 !important; border-color: #1f2937 !important; }
+        html.dark .text-gray-800 { color: #f3f4f6 !important; }
+        html.dark .text-gray-900 { color: #f9fafb !important; }
+        html.dark .border-gray-200, html.dark .border-gray-100 { border-color: #374151 !important; }
+</style>
+</head>
+<body class="text-gray-800 font-sans min-h-screen flex flex-col">
+    
+    <!-- Hero Section with Navbar -->
+    <div class="hero-bg pb-16 pt-4 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        
+        <!-- Navbar -->
+        <nav class="max-w-7xl mx-auto flex justify-between items-center bg-white rounded-full px-6 py-3 shadow-sm mb-12">
+            <div class="flex items-center space-x-2">
+                <div class="bg-primary text-white p-2 rounded-lg">
+                    <i class="fas fa-comment-dots text-xl"></i>
+                </div>
+                <span class="font-extrabold text-2xl tracking-tight text-gray-900">SafeTalk <span class="text-primary">AI</span></span>
+            </div>
+            
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-600">
+                <a href="/" class="bg-indigo-50 text-primary px-4 py-2 rounded-full">Home</a>
+                <a href="/#detect" class="hover:text-primary px-4 py-2">Detect</a>
+                <a href="/about" class="hover:text-primary px-4 py-2">About</a>
+                <a href="/team" class="hover:text-primary px-4 py-2">Team</a>
+            </div>
+            
+            <div class="flex space-x-4 text-gray-500">
+                <button id="theme-sun" class="hover:text-primary cursor-pointer transition-colors" title="Light Mode"><i class="fas fa-sun text-lg"></i></button>
+                <button id="theme-moon" class="hover:text-primary cursor-pointer transition-colors" title="Dark Mode"><i class="fas fa-moon text-lg"></i></button>
+            </div>
+        </nav>
+
+        <!-- Hero Content -->
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="z-10">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-6">
+                    AI-Based <span class="text-primary">Cyberbullying</span> and <br/>
+                    <span class="text-accent">Toxic Comment</span> Detection System
+                </h1>
+                <p class="text-lg text-gray-600 mb-8 max-w-lg">
+                    Enter a comment and get an instant AI-powered analysis to promote safer and more inclusive online communication.
+                </p>
+            </div>
+            
+            <!-- Abstract Floating Bubbles (acting as illustration replacement) -->
+            <div class="hidden lg:block relative h-64 w-full">
+                <div class="absolute top-0 right-10 bg-white shadow-md rounded-2xl px-4 py-2 flex items-center space-x-2 transform rotate-2 animate-bounce" style="animation-duration: 3s;">
+                    <span class="text-sm font-medium text-gray-700">You're amazing!</span>
+                    <span class="text-lg">😀</span>
+                </div>
+                <div class="absolute top-20 right-40 bg-red-50 shadow-md rounded-2xl px-4 py-2 flex items-center space-x-2 transform -rotate-3 animate-bounce" style="animation-duration: 4s;">
+                    <span class="text-sm font-medium text-red-700">You are so stupid!</span>
+                    <span class="text-lg">😡</span>
+                </div>
+                <div class="absolute bottom-10 right-20 bg-blue-50 shadow-md rounded-2xl px-4 py-2 flex items-center space-x-2 transform rotate-1 animate-bounce" style="animation-duration: 3.5s;">
+                    <span class="text-sm font-medium text-blue-700">I will hurt you!</span>
+                    <span class="text-lg">😠</span>
+                </div>
+                <!-- Large Shield Icon -->
+                <div class="absolute top-1/2 left-10 transform -translate-y-1/2 bg-accent text-white p-4 rounded-full shadow-lg opacity-80">
+                    <i class="fas fa-shield-check text-4xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main id="detect" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20 flex-grow mb-20 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- LEFT CARD: Input -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 border border-gray-100">
+                <div class="flex items-center space-x-3 mb-2">
+                    <i class="fas fa-edit text-primary text-xl"></i>
+                    <h2 class="text-2xl font-bold text-gray-900">Enter a Comment</h2>
+                </div>
+                <p class="text-sm text-gray-500 mb-6">Type or paste a comment below to check if it is toxic, cyberbullying, or safe.</p>
+                
+                <form id="analyze-form" class="space-y-4">
+                    <div class="relative">
+                        <textarea 
+                            id="comment-input" 
+                            rows="5" 
+                            class="block w-full rounded-xl border border-gray-200 shadow-inner focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 p-4 text-gray-700 resize-none transition"
+                            placeholder="Type a comment to analyze..."
+                            maxlength="500"
+                            required
+                        ></textarea>
+                        <div class="absolute bottom-3 right-4 text-xs text-gray-400 font-medium">
+                            <span id="char-count">0</span>/500
+                        </div>
+                    </div>
+                    
+                    <button 
+                        type="submit" 
+                        id="submit-btn"
+                        class="w-full flex justify-center items-center px-6 py-3.5 border border-transparent text-base font-semibold rounded-xl shadow-md text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+                    >
+                        <i class="fas fa-search mr-2"></i> Analyze Comment
+                    </button>
+                </form>
+
+                <div class="mt-8">
+                    <p class="text-sm font-semibold text-gray-700 mb-3">Try an example:</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="example-btn px-4 py-2 bg-green-50 text-green-700 hover:bg-green-100 text-sm font-medium rounded-lg transition" data-text="You are amazing, thanks for the help!">You are amazing!</button>
+                        <button class="example-btn px-4 py-2 bg-red-50 text-red-700 hover:bg-red-100 text-sm font-medium rounded-lg transition" data-text="You are so stupid and nobody likes you.">You are so stupid!</button>
+                        <button class="example-btn px-4 py-2 bg-red-50 text-red-700 hover:bg-red-100 text-sm font-medium rounded-lg transition" data-text="I will find you and hurt you!">I will hurt you!</button>
+                        <button class="example-btn px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 text-sm font-medium rounded-lg transition" data-text="Great video, keep it up!">Great video, keep it up!</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT CARD: Results -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 border border-gray-100 flex flex-col h-full">
+                <div class="flex items-center space-x-3 mb-6">
+                    <i class="fas fa-chart-bar text-primary text-xl"></i>
+                    <h2 class="text-2xl font-bold text-gray-900">Analysis Result</h2>
+                </div>
+
+                <!-- Initial Empty State -->
+                <div id="empty-state" class="flex-grow flex flex-col items-center justify-center text-gray-400 py-12">
+                    <i class="fas fa-robot text-5xl mb-4 opacity-30"></i>
+                    <p class="text-center">Submit a comment to see the AI analysis results here.</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading" class="hidden flex-grow flex flex-col items-center justify-center py-12">
+                    <i class="fas fa-circle-notch fa-spin text-primary text-4xl mb-4"></i>
+                    <p class="text-gray-500 font-medium">Analyzing content...</p>
+                </div>
+
+                <!-- Results Display (Hidden initially) -->
+                <div id="results" class="hidden flex-col space-y-4">
+                    
+                    <!-- Alert Banner -->
+                    <div id="result-banner" class="rounded-xl p-4 flex items-start space-x-4">
+                        <div id="banner-icon-container" class="rounded-full p-2 flex-shrink-0">
+                            <i id="banner-icon" class="fas fa-exclamation-triangle text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 id="banner-title" class="text-lg font-bold">Toxic Comment Detected</h3>
+                            <p id="banner-desc" class="text-sm mt-1">This comment contains harmful or inappropriate content.</p>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Rows -->
+                    <div class="space-y-3 mt-4">
+                        <!-- Top Category -->
+                        <div id="row-category" class="flex justify-between items-center p-4 rounded-xl">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-tag text-gray-400"></i>
+                                <span class="font-semibold text-gray-700">Top Category</span>
+                            </div>
+                            <span id="val-category" class="font-bold">None</span>
+                        </div>
+
+                        <!-- Confidence Score -->
+                        <div class="flex justify-between items-center p-4 rounded-xl bg-blue-50 text-blue-900">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-chart-line text-blue-400"></i>
+                                <span class="font-semibold">Confidence Score</span>
+                            </div>
+                            <span id="val-confidence" class="font-bold">0%</span>
+                        </div>
+
+                        <!-- Toxicity Level -->
+                        <div id="row-level" class="flex justify-between items-center p-4 rounded-xl">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-shield-alt text-gray-400"></i>
+                                <span class="font-semibold text-gray-700">Toxicity Level</span>
+                            </div>
+                            <span id="val-level" class="font-bold">Low</span>
+                        </div>
+                    </div>
+
+                    <!-- Processed Text -->
+                    <div class="mt-6 border-t border-gray-100 pt-6">
+                        <div class="flex items-center space-x-2 text-gray-500 mb-2">
+                            <i class="fas fa-file-alt"></i>
+                            <span class="font-semibold text-sm">Processed Text</span>
+                        </div>
+                        <p id="processed-text" class="text-gray-700 italic text-sm">...</p>
+                    </div>
+
+                    <!-- Detailed Breakdown -->
+                    <div class="mt-4">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">All Detected Categories (>50%):</p>
+                        <div id="all-categories" class="flex flex-wrap gap-2 text-xs">
+                            <!-- Pills go here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Character counter
+        const textarea = document.getElementById('comment-input');
+        const charCount = document.getElementById('char-count');
+        textarea.addEventListener('input', () => {
+            charCount.textContent = textarea.value.length;
+        });
+
+        // Example buttons
+        document.querySelectorAll('.example-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                textarea.value = btn.getAttribute('data-text');
+                charCount.textContent = textarea.value.length;
+            });
+        });
+
+        // Form submission
+        document.getElementById('analyze-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const text = textarea.value;
+            if (!text.trim()) return;
+
+            // UI transitions
+            document.getElementById('empty-state').classList.add('hidden');
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Analyzing...';
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResults(data, text);
+                } else {
+                    alert('Error analyzing text: ' + (data.error || 'Unknown error'));
+                    resetUI();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to connect to the server.');
+                resetUI();
+            }
+        });
+
+        function resetUI() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('empty-state').classList.remove('hidden');
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+            submitBtn.innerHTML = '<i class="fas fa-search mr-2"></i> Analyze Comment';
+        }
+
+        function displayResults(data, originalText) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('results').classList.add('flex'); // Because it's flex-col
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+            submitBtn.innerHTML = '<i class="fas fa-search mr-2"></i> Analyze Comment';
+
+            // Find max score category
+            let maxCategory = 'None';
+            let maxScore = 0;
+            const harmfulLabels = [];
+
+            for (const [label, score] of Object.entries(data.predictions)) {
+                if (score > maxScore) {
+                    maxScore = score;
+                    maxCategory = label;
+                }
+                if (score > 0.5) {
+                    harmfulLabels.push(label);
+                }
+            }
+
+            const isToxic = data.is_toxic;
+            
+            // Format labels (e.g., severe_toxic -> Severe Toxic)
+            const formatLabel = (str) => str.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+            // 1. Banner Update
+            const banner = document.getElementById('result-banner');
+            const iconContainer = document.getElementById('banner-icon-container');
+            const icon = document.getElementById('banner-icon');
+            const title = document.getElementById('banner-title');
+            const desc = document.getElementById('banner-desc');
+
+            if (isToxic) {
+                banner.className = 'rounded-xl p-5 flex items-start space-x-4 bg-red-50 text-red-900 border border-red-100';
+                iconContainer.className = 'rounded-full p-3 flex-shrink-0 bg-red-400 text-white shadow-sm';
+                icon.className = 'fas fa-exclamation-triangle text-xl';
+                title.textContent = 'Toxic Comment Detected';
+                desc.textContent = 'This comment contains harmful or inappropriate content.';
+                desc.className = 'text-sm mt-1 text-red-700';
+            } else {
+                banner.className = 'rounded-xl p-5 flex items-start space-x-4 bg-green-50 text-green-900 border border-green-100';
+                iconContainer.className = 'rounded-full p-3 flex-shrink-0 bg-green-400 text-white shadow-sm';
+                icon.className = 'fas fa-check-circle text-xl';
+                title.textContent = 'Safe Comment';
+                desc.textContent = 'This comment appears to be safe and appropriate.';
+                desc.className = 'text-sm mt-1 text-green-700';
+            }
+
+            // 2. Metrics Update
+            const rowCat = document.getElementById('row-category');
+            const valCat = document.getElementById('val-category');
+            const rowLevel = document.getElementById('row-level');
+            const valLevel = document.getElementById('val-level');
+            const valConf = document.getElementById('val-confidence');
+
+            valConf.textContent = (maxScore * 100).toFixed(1) + '%';
+            document.getElementById('processed-text').textContent = originalText.toLowerCase().replace(/[^a-z\s]/g, '');
+
+            if (isToxic) {
+                rowCat.className = 'flex justify-between items-center p-4 rounded-xl bg-red-50 text-red-900';
+                valCat.textContent = formatLabel(maxCategory);
+                
+                rowLevel.className = 'flex justify-between items-center p-4 rounded-xl bg-red-50 text-red-900';
+                valLevel.textContent = maxScore > 0.85 ? 'High' : 'Medium';
+            } else {
+                rowCat.className = 'flex justify-between items-center p-4 rounded-xl bg-green-50 text-green-900';
+                valCat.textContent = 'Safe';
+                
+                rowLevel.className = 'flex justify-between items-center p-4 rounded-xl bg-green-50 text-green-900';
+                valLevel.textContent = 'None';
+            }
+
+            // 3. All Categories Pills
+            const pillsContainer = document.getElementById('all-categories');
+            pillsContainer.innerHTML = '';
+            
+            if (harmfulLabels.length > 0) {
+                harmfulLabels.forEach(label => {
+                    const pill = document.createElement('span');
+                    pill.className = 'px-3 py-1 bg-red-100 text-red-800 rounded-full font-medium';
+                    pill.textContent = formatLabel(label);
+                    pillsContainer.appendChild(pill);
+                });
+            } else {
+                const pill = document.createElement('span');
+                pill.className = 'px-3 py-1 bg-green-100 text-green-800 rounded-full font-medium';
+                pill.textContent = 'Clean / Safe';
+                pillsContainer.appendChild(pill);
+            }
+        }
+    </script>
+
+    <script>
+        // Dark Mode Logic
+        const htmlDoc = document.documentElement;
+        const sunBtn = document.getElementById('theme-sun');
+        const moonBtn = document.getElementById('theme-moon');
+
+        // Check preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlDoc.classList.add('dark');
+        } else {
+            htmlDoc.classList.remove('dark');
+        }
+
+        if (sunBtn && moonBtn) {
+            sunBtn.addEventListener('click', () => { 
+                htmlDoc.classList.remove('dark'); 
+                localStorage.theme = 'light'; 
+            });
+            moonBtn.addEventListener('click', () => { 
+                htmlDoc.classList.add('dark'); 
+                localStorage.theme = 'dark'; 
+            });
+        }
+    </script>
+</body>
+
+</html>
