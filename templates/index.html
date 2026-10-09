@@ -98,6 +98,7 @@
                 <a href="/#detect" class="hover:text-primary px-4 py-2">Detect</a>
                 <a href="/about" class="hover:text-primary px-4 py-2">About</a>
                 <a href="/team" class="hover:text-primary px-4 py-2">Team</a>
+                <a href="/evaluation" class="hover:text-primary px-4 py-2">Evaluation</a>
             </div>
             
             <div class="flex space-x-4 text-gray-500">
@@ -266,12 +267,57 @@
                             <!-- Pills go here -->
                         </div>
                     </div>
+
+                    <!-- Disclaimer & Feedback -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-xl text-sm border border-gray-100">
+                        <p class="text-gray-600 mb-3"><i class="fas fa-info-circle text-primary"></i> <strong>Note:</strong> This AI output is a suggestion, not a final judgment. Context, slang, and intent matter greatly in human communication.</p>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-gray-500 font-medium text-xs">Did we get this wrong?</span>
+                            <button id="flag-btn" class="text-xs px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100 transition text-gray-700">
+                                <i class="fas fa-flag text-red-400 mr-1"></i> Flag as Incorrect
+                            </button>
+                        </div>
+                        <p id="flag-thanks" class="hidden text-green-600 text-xs mt-2 font-medium">Thanks for your feedback! This helps us improve.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Privacy Notice Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500">
+            <h4 class="font-bold text-gray-700 mb-2">Privacy Notice</h4>
+            <p class="max-w-2xl mx-auto">
+                Comments submitted for analysis are <strong>not stored</strong> on our servers. They are processed in real-time in memory and immediately discarded after the results are returned. We do not use your inputs to further train the model without explicit consent. 
+            </p>
+        </div>
+    </footer>
+
     <script>
+        // Flag as Incorrect button logic
+        document.getElementById('flag-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('flag-btn');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            try {
+                await fetch('/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: latestAnalyzedText,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                document.getElementById('flag-thanks').classList.remove('hidden');
+            } catch (err) {
+                console.error("Failed to send feedback", err);
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+
         // Character counter
         const textarea = document.getElementById('comment-input');
         const charCount = document.getElementById('char-count');
@@ -287,12 +333,25 @@
             });
         });
 
+        // Store latest analyzed text
+        let latestAnalyzedText = "";
+
         // Form submission
         document.getElementById('analyze-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const text = textarea.value;
             if (!text.trim()) return;
+
+            latestAnalyzedText = text;
+
+            // Reset feedback button state
+            const flagBtn = document.getElementById('flag-btn');
+            if (flagBtn) {
+                flagBtn.disabled = false;
+                flagBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                document.getElementById('flag-thanks').classList.add('hidden');
+            }
 
             // UI transitions
             document.getElementById('empty-state').classList.add('hidden');

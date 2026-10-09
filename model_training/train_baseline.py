@@ -53,9 +53,17 @@ def preprocess_text(text):
     
     return ' '.join(tokens)
 
-def get_dummy_dataset():
-    """Returns a small synthetic dataset for demonstration purposes if real data isn't available."""
-    print("WARNING: Using synthetic dataset. Please provide the Jigsaw dataset for real training.")
+def load_dataset():
+    """Loads the Jigsaw Toxic Comment dataset."""
+    import os
+    if os.path.exists("train.csv"):
+        print("Loading Jigsaw dataset from train.csv...")
+        df = pd.read_csv("train.csv")
+        if 'comment_text' in df.columns and 'toxic' in df.columns:
+            return df
+            
+    print("WARNING: train.csv not found. Please download the Jigsaw Toxic Comment Classification dataset from Kaggle and place train.csv in this directory.")
+    print("Using a small synthetic dataset instead.")
     data = {
         'comment_text': [
             "I love this project, it's very helpful!",
@@ -122,8 +130,5 @@ def train_and_evaluate(df):
         print("Classification Report:\n", classification_report(y_test, y_pred, zero_division=0))
 
 if __name__ == "__main__":
-    # In a real scenario, you would load the dataset like this:
-    # df = pd.read_csv('path_to_jigsaw_train.csv')
-    
-    df = get_dummy_dataset()
+    df = load_dataset()
     train_and_evaluate(df)

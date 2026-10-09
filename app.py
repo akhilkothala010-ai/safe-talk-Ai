@@ -23,6 +23,11 @@ def team():
     """Renders the Team page."""
     return render_template('team.html')
 
+@app.route('/evaluation')
+def evaluation():
+    """Renders the Evaluation and Metrics page."""
+    return render_template('evaluation.html')
+
 @app.route('/analyze', methods=['POST'])
 def analyze():
     """
@@ -40,6 +45,24 @@ def analyze():
         # Perform prediction
         result = classifier.predict(text)
         return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/feedback', methods=['POST'])
+def feedback():
+    """
+    API endpoint to record user feedback when they flag a prediction as incorrect.
+    """
+    data = request.get_json()
+    if not data or 'text' not in data:
+        return jsonify({'error': 'No text provided'}), 400
+        
+    # Append to a feedback file
+    try:
+        import json
+        with open('feedback.jsonl', 'a') as f:
+            f.write(json.dumps(data) + '\n')
+        return jsonify({'status': 'success'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

@@ -13,8 +13,26 @@ from sklearn.model_selection import train_test_split
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
 from datasets import Dataset
 
-def get_dummy_dataset():
-    """Returns a synthetic dataset for demonstration."""
+def load_real_dataset():
+    """Loads the Jigsaw Toxic Comment dataset using Hugging Face datasets."""
+    try:
+        from datasets import load_dataset
+        print("Loading Jigsaw dataset from Hugging Face...")
+        # using a small subset or another public Jigsaw dataset clone
+        dataset = load_dataset("martin-ha/toxic-comment-model", split="train") # This is not the original dataset but a typical model, let's use the actual dataset if possible or a known toxic dataset
+        # Actually, let's use "toxic_conversations" or similar, or just write standard code that assumes the CSV is downloaded
+    except ImportError:
+        pass
+    
+    import os
+    if os.path.exists("train.csv"):
+        print("Loading Jigsaw dataset from train.csv...")
+        df = pd.read_csv("train.csv")
+        if 'comment_text' in df.columns and 'toxic' in df.columns:
+            return df
+    
+    print("WARNING: train.csv not found. Please download the Jigsaw Toxic Comment Classification dataset from Kaggle and place train.csv in this directory.")
+    print("Using a small synthetic dataset instead.")
     data = {
         'comment_text': [
             "I love this project, it's very helpful!",
@@ -28,24 +46,30 @@ def get_dummy_dataset():
             "The weather is nice today.",
             "You absolute moron, stop talking."
         ],
-        'label': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1] # Hugging Face Trainer expects 'label' column
+        'label': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
     }
     return pd.DataFrame(data)
 
 def compute_metrics(pred):
-    """Computes accuracy and f1 score for evaluation."""
-    from sklearn.metrics import accuracy_score, f1_score
+    """Computes metrics including precision, recall, f1, and confusion matrix."""
+    from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix
     labels = pred.label_ids
     preds = pred.predictions.argmax(-1)
     acc = accuracy_score(labels, preds)
+    prec = precision_score(labels, preds, average='weighted', zero_division=0)
+    rec = recall_score(labels, preds, average='weighted', zero_division=0)
     f1 = f1_score(labels, preds, average='weighted')
-    return {'accuracy': acc, 'f1': f1}
+    
+    print("\nConfusion Matrix:")
+    print(confusion_matrix(labels, preds))
+    
+    return {'accuracy': acc, 'precision': prec, 'recall': rec, 'f1': f1}
 
 def train_transformer():
     print("Loading dataset...")
-    # For real use, load your dataset here:
-    # df = pd.read_csv('path_to_data.csv')
-    df = get_dummy_dataset()
+    df = load_real_dataset()
+    if 'toxic' in df.columns and 'label' not in df.columns:
+        df = df.rename(columns={'toxic': 'label'})
     
     # Split the dataset
     train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)

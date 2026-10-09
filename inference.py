@@ -36,7 +36,14 @@ class ToxicClassifier:
         is_toxic = False
         
         # Sort results by score in descending order
-        sorted_results = sorted(results[0], key=lambda x: x['score'], reverse=True)
+        if results and isinstance(results[0], list):
+            sorted_results = sorted(
+                results[0], key=lambda x: x['score'], reverse=True
+        )
+        else:
+            sorted_results = sorted(
+                results, key=lambda x: x['score'], reverse=True
+            )
         
         for item in sorted_results:
             label = item['label']
