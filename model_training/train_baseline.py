@@ -1,134 +1,81 @@
-"""
-SafeTalk AI - Baseline Machine Learning Models
-
-This script demonstrates how to train traditional ML models (Logistic Regression,
-Naive Bayes, SVM) on a dataset for toxic comment classification.
-It uses TF-IDF for feature extraction.
-
-Dataset expected format: A CSV file with a 'comment_text' column and a 'toxic' label column.
-For demonstration, this script uses a small synthetic dataset if no real dataset is provided.
-"""
 
 import pandas as pd
-import numpy as np
-import re
-import nltk
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from sklearn.model_selection import train_test_split
+import joblib
+from pathlib import Path
+
+from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import LinearSVC
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
+from sklearn.metrics import (
+    accuracy_score,
+    precision_recall_fscore_support,
+)
 
-# Download required NLTK resources
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
-    nltk.download('wordnet')
+DATA = Path("data/processed")
+OUT = Path("model_training/saved_models")
+OUT.mkdir(parents=True, exist_ok=True)
 
-def preprocess_text(text):
-    """
-    Preprocess text: lowercase, remove punctuation/numbers, remove stopwords, lemmatize.
-    """
-    if not isinstance(text, str):
-        return ""
-        
-    # 1. Lowercase
-    text = text.lower()
-    
-    # 2. Remove noise (punctuation, special chars, numbers)
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
-    
-    # 3. Tokenize and remove stopwords
-    stop_words = set(stopwords.words('english'))
-    tokens = text.split()
-    tokens = [word for word in tokens if word not in stop_words]
-    
-    # 4. Lemmatization
-    lemmatizer = WordNetLemmatizer()
-    tokens = [lemmatizer.lemmatize(word) for word in tokens]
-    
-    return ' '.join(tokens)
+LABELS = [
+    "toxic", "severe_toxic", "obscene",
+    "threat", "insult", "identity_hate"
+]
 
-def load_dataset():
-    """Loads the Jigsaw Toxic Comment dataset."""
-    import os
-    if os.path.exists("train.csv"):
-        print("Loading Jigsaw dataset from train.csv...")
-        df = pd.read_csv("train.csv")
-        if 'comment_text' in df.columns and 'toxic' in df.columns:
-            return df
-            
-    print("WARNING: train.csv not found. Please download the Jigsaw Toxic Comment Classification dataset from Kaggle and place train.csv in this directory.")
-    print("Using a small synthetic dataset instead.")
-    data = {
-        'comment_text': [
-            "I love this project, it's very helpful!",
-            "You are a terrible person and I hate you.",
-            "Can someone explain how this works?",
-            "Shut up you idiot, nobody cares.",
-            "Thank you for the detailed explanation.",
-            "This is the worst idea ever, you're stupid.",
-            "Good morning everyone!",
-            "I will find you and hurt you.",
-            "The weather is nice today.",
-            "You absolute moron, stop talking."
-        ],
-        'toxic': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
-    }
-    return pd.DataFrame(data)
+train = pd.read_csv(DATA / "train.csv")
+val = pd.read_csv(DATA / "validation.csv")
 
-def train_and_evaluate(df):
-    """Trains and evaluates baseline models."""
-    print("Preprocessing text...")
-    df['clean_text'] = df['comment_text'].apply(preprocess_text)
-    
-    X = df['clean_text']
-    y = df['toxic']
-    
-    # Train-test split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    print("Vectorizing text using TF-IDF...")
-    tfidf = TfidfVectorizer(max_features=5000)
-    X_train_tfidf = tfidf.fit_transform(X_train)
-    X_test_tfidf = tfidf.transform(X_test)
-    
-    # Define models
-    models = {
-        "Logistic Regression": LogisticRegression(max_iter=1000),
-        "Naive Bayes": MultinomialNB(),
-        "Linear SVM": LinearSVC(max_iter=1000)
-    }
-    
-    results = {}
-    
-    for name, model in models.items():
-        print(f"\n--- Training {name} ---")
-        model.fit(X_train_tfidf, y_train)
-        
-        # Predictions
-        y_pred = model.predict(X_test_tfidf)
-        
-        # Evaluation
-        acc = accuracy_score(y_test, y_pred)
-        prec = precision_score(y_test, y_pred, zero_division=0)
-        rec = recall_score(y_test, y_pred, zero_division=0)
-        f1 = f1_score(y_test, y_pred, zero_division=0)
-        cm = confusion_matrix(y_test, y_pred)
-        
-        results[name] = {'Accuracy': acc, 'Precision': prec, 'Recall': rec, 'F1-Score': f1}
-        
-        print(f"Accuracy: {acc:.4f}")
-        print(f"Precision: {prec:.4f}")
-        print(f"Recall: {rec:.4f}")
-        print(f"F1-Score: {f1:.4f}")
-        print("Confusion Matrix:\n", cm)
-        print("Classification Report:\n", classification_report(y_test, y_pred, zero_division=0))
+X_train = train["comment_text"].fillna("")
+y_train = train[LABELS].astype(int)
+X_val = val["comment_text"].fillna("")
+y_val = val[LABELS].astype(int)
 
-if __name__ == "__main__":
-    df = load_dataset()
-    train_and_evaluate(df)
+models = {
+    "logistic_regression": LogisticRegression(
+        max_iter=1000,
+        class_weight="balanced",
+    ),
+    "linear_svm": LinearSVC(
+        class_weight="balanced",
+        dual="auto",
+    ),
+}
+
+for name, classifier in models.items():
+    print(f"\nTraining {name}...", flush=True)
+
+    model = Pipeline([
+        ("tfidf", TfidfVectorizer(
+            max_features=50000,
+            ngram_range=(1, 2),
+            min_df=2,
+            sublinear_tf=True,
+            strip_accents="unicode",
+        )),
+        ("classifier", OneVsRestClassifier(classifier)),
+    ])
+
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_val)
+
+    precision, recall, f1, _ = (
+        precision_recall_fscore_support(
+            y_val,
+            predictions,
+            average="macro",
+            zero_division=0,
+        )
+    )
+
+    subset_accuracy = accuracy_score(y_val, predictions)
+
+    print(f"Validation macro precision: {precision:.4f}")
+    print(f"Validation macro recall:    {recall:.4f}")
+    print(f"Validation macro F1:        {f1:.4f}")
+    print(f"Validation subset accuracy: {subset_accuracy:.4f}")
+
+    path = OUT / f"{name}.joblib"
+    joblib.dump(model, path)
+    print(f"Saved model: {path}")
+
+print("\nBaseline training complete.")

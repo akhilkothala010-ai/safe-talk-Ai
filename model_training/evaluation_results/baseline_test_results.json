@@ -1,0 +1,220 @@
+{
+  "logistic_regression": {
+    "model": "logistic_regression",
+    "selected_threshold": 0.3,
+    "validation_macro_f1_at_selected_threshold": 0.6481142798304259,
+    "test_macro_precision": 0.5970045290454428,
+    "test_macro_recall": 0.7192852267535748,
+    "test_macro_f1": 0.6373690321409494,
+    "test_subset_accuracy": 0.6974450194049159,
+    "per_label": {
+      "toxic": {
+        "precision": 0.892114175133043,
+        "recall": 0.8073555166374781,
+        "f1": 0.8476212364973569,
+        "support": 2284
+      },
+      "severe_toxic": {
+        "precision": 0.3390804597701149,
+        "recall": 0.731404958677686,
+        "f1": 0.46335078534031415,
+        "support": 242
+      },
+      "obscene": {
+        "precision": 0.8500823723228995,
+        "recall": 0.7830045523520486,
+        "f1": 0.8151658767772512,
+        "support": 1318
+      },
+      "threat": {
+        "precision": 0.4392523364485981,
+        "recall": 0.6266666666666667,
+        "f1": 0.5164835164835165,
+        "support": 75
+      },
+      "insult": {
+        "precision": 0.6989247311827957,
+        "recall": 0.7564422277639236,
+        "f1": 0.7265469061876247,
+        "support": 1203
+      },
+      "identity_hate": {
+        "precision": 0.36257309941520466,
+        "recall": 0.6108374384236454,
+        "f1": 0.45504587155963305,
+        "support": 203
+      }
+    },
+    "per_label_confusion_matrices": {
+      "toxic": [
+        [
+          3677,
+          223
+        ],
+        [
+          440,
+          1844
+        ]
+      ],
+      "severe_toxic": [
+        [
+          5597,
+          345
+        ],
+        [
+          65,
+          177
+        ]
+      ],
+      "obscene": [
+        [
+          4684,
+          182
+        ],
+        [
+          286,
+          1032
+        ]
+      ],
+      "threat": [
+        [
+          6049,
+          60
+        ],
+        [
+          28,
+          47
+        ]
+      ],
+      "insult": [
+        [
+          4589,
+          392
+        ],
+        [
+          293,
+          910
+        ]
+      ],
+      "identity_hate": [
+        [
+          5763,
+          218
+        ],
+        [
+          79,
+          124
+        ]
+      ]
+    }
+  },
+  "linear_svm": {
+    "model": "linear_svm",
+    "selected_threshold": 0.3,
+    "validation_macro_f1_at_selected_threshold": 0.6152196592375362,
+    "test_macro_precision": 0.6721801533263508,
+    "test_macro_recall": 0.528237111729921,
+    "test_macro_f1": 0.5876001769638569,
+    "test_subset_accuracy": 0.7136157826649417,
+    "per_label": {
+      "toxic": {
+        "precision": 0.9133192389006343,
+        "recall": 0.7565674255691769,
+        "f1": 0.8275862068965517,
+        "support": 2284
+      },
+      "severe_toxic": {
+        "precision": 0.4015748031496063,
+        "recall": 0.4214876033057851,
+        "f1": 0.4112903225806452,
+        "support": 242
+      },
+      "obscene": {
+        "precision": 0.8915547024952015,
+        "recall": 0.704855842185129,
+        "f1": 0.7872881355932203,
+        "support": 1318
+      },
+      "threat": {
+        "precision": 0.5609756097560976,
+        "recall": 0.30666666666666664,
+        "f1": 0.39655172413793105,
+        "support": 75
+      },
+      "insult": {
+        "precision": 0.7656565656565657,
+        "recall": 0.6300914380714879,
+        "f1": 0.6912904696762426,
+        "support": 1203
+      },
+      "identity_hate": {
+        "precision": 0.5,
+        "recall": 0.3497536945812808,
+        "f1": 0.4115942028985507,
+        "support": 203
+      }
+    },
+    "per_label_confusion_matrices": {
+      "toxic": [
+        [
+          3736,
+          164
+        ],
+        [
+          556,
+          1728
+        ]
+      ],
+      "severe_toxic": [
+        [
+          5790,
+          152
+        ],
+        [
+          140,
+          102
+        ]
+      ],
+      "obscene": [
+        [
+          4753,
+          113
+        ],
+        [
+          389,
+          929
+        ]
+      ],
+      "threat": [
+        [
+          6091,
+          18
+        ],
+        [
+          52,
+          23
+        ]
+      ],
+      "insult": [
+        [
+          4749,
+          232
+        ],
+        [
+          445,
+          758
+        ]
+      ],
+      "identity_hate": [
+        [
+          5910,
+          71
+        ],
+        [
+          132,
+          71
+        ]
+      ]
+    }
+  }
+}

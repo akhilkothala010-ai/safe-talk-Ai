@@ -1,0 +1,109 @@
+{
+  "model": "unitary/toxic-bert",
+  "selected_threshold": 0.6,
+  "validation_macro_f1_at_selected_threshold": 0.7523969209613588,
+  "test_macro_precision": 0.7845692769056797,
+  "test_macro_recall": 0.7641866735204398,
+  "test_macro_f1": 0.7660243280752463,
+  "test_subset_accuracy": 0.817,
+  "per_label": {
+    "toxic": {
+      "precision": 0.9349030470914127,
+      "recall": 0.9121621621621622,
+      "f1": 0.9233926128590971,
+      "support": 740
+    },
+    "severe_toxic": {
+      "precision": 0.5,
+      "recall": 0.23684210526315788,
+      "f1": 0.32142857142857145,
+      "support": 76
+    },
+    "obscene": {
+      "precision": 0.8552915766738661,
+      "recall": 0.927400468384075,
+      "f1": 0.8898876404494382,
+      "support": 427
+    },
+    "threat": {
+      "precision": 0.84,
+      "recall": 0.84,
+      "f1": 0.84,
+      "support": 25
+    },
+    "insult": {
+      "precision": 0.830952380952381,
+      "recall": 0.8994845360824743,
+      "f1": 0.8638613861386139,
+      "support": 388
+    },
+    "identity_hate": {
+      "precision": 0.746268656716418,
+      "recall": 0.7692307692307693,
+      "f1": 0.7575757575757576,
+      "support": 65
+    }
+  },
+  "per_label_confusion_matrices": {
+    "toxic": [
+      [
+        1213,
+        47
+      ],
+      [
+        65,
+        675
+      ]
+    ],
+    "severe_toxic": [
+      [
+        1906,
+        18
+      ],
+      [
+        58,
+        18
+      ]
+    ],
+    "obscene": [
+      [
+        1506,
+        67
+      ],
+      [
+        31,
+        396
+      ]
+    ],
+    "threat": [
+      [
+        1971,
+        4
+      ],
+      [
+        4,
+        21
+      ]
+    ],
+    "insult": [
+      [
+        1541,
+        71
+      ],
+      [
+        39,
+        349
+      ]
+    ],
+    "identity_hate": [
+      [
+        1918,
+        17
+      ],
+      [
+        15,
+        50
+      ]
+    ]
+  }
+}
